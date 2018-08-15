@@ -1,11 +1,11 @@
 package uk.gov.companieshouse.document.generator.core.avro;
 
 
+import java.io.IOException;
+
 import uk.gov.companieshouse.document.generator.core.document.models.DocumentGenerationCompleted;
 import uk.gov.companieshouse.document.generator.core.document.models.DocumentGenerationFailed;
 import uk.gov.companieshouse.document.generator.core.document.models.DocumentGenerationStarted;
-
-import java.io.IOException;
 
 public class DocumentGenerationStateAvroSerializer {
 
