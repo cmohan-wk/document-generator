@@ -48,6 +48,7 @@ public class AccountsDocumentInfoServiceImpl implements DocumentInfoService {
 
         String resourceId = documentInfoRequest.getResourceId();
         String resourceUri = documentInfoRequest.getResourceUri();
+        String transactionId = documentInfoRequest.getResourceUri().replaceAll("[^\\d-]", "");
         String requestId = documentInfoRequest.getRequestId();
 
         final Map< String, Object > debugMap = new HashMap< >();
@@ -58,21 +59,21 @@ public class AccountsDocumentInfoServiceImpl implements DocumentInfoService {
 
         Transaction transaction;
         try {
-            transaction = transactionService.getTransaction(resourceId, requestId);
+            transaction = transactionService.getTransaction(transactionId, requestId);
         } catch (ServiceException e) {
-            LOG.errorContext(requestId,"An error occurred when calling the transaction service with resource id: "
-                    + resourceId, e, debugMap);
-            throw new DocumentInfoException("Failed to get transaction with resourceId: " + resourceId, e);
+            LOG.errorContext(requestId,"An error occurred when calling the transaction service with transactionId: "
+                    + transactionId, e, debugMap);
+            throw new DocumentInfoException("Failed to get transaction with transactionId: " + transactionId, e);
         }
 
         String resourceLink =  Optional.of(transaction)
                 .map(Transaction::getResources)
-                .map(resources -> resources.get(resourceUri))
+                .map(resources -> resources.get(resourceId))
                 .map(Resources::getLinks)
                 .map(links -> links.get(LinkType.RESOURCE.getLink()))
                 .orElseGet(() -> {
                     LOG.infoContext(requestId,"Unable to find resource: " + resourceId
-                            + " in transaction: " + resourceUri, debugMap);
+                            + " in transaction: " + resourceId, debugMap);
                     return "";
                 });
 

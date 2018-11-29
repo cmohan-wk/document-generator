@@ -49,9 +49,9 @@ public class AccountsDocumentInfoServiceImplTest {
     @Mock
     private Transaction transaction;
 
-    private static final String RESOURCE_ID = "/transactions/091174-913515-326060";
-    private static final String RESOURCE_URI_ABRIDGED = "/transactions/091174-913515-326060/accounts/xU-6Vebn7F8AgLwa2QHBUL2yRpk=";
-    private static final String RESOURCE_URI_SMALL_FULL = "/transactions/091174-913515-326060/company-accounts/xU-6Vebn7F8AgLwa2QHBUL2yRpk=";
+    private static final String RESOURCE_URI = "/transactions/091174-913515-326060";
+    private static final String RESOURCE_ID_ABRIDGED = "/transactions/091174-913515-326060/accounts/xU-6Vebn7F8AgLwa2QHBUL2yRpk=";
+    private static final String RESOURCE_ID_SMALL_FULL = "/transactions/091174-913515-326060/company-accounts/xU-6Vebn7F8AgLwa2QHBUL2yRpk=";
     private static final String REQUEST_ID = "requestId";
 
     @Test
@@ -60,7 +60,7 @@ public class AccountsDocumentInfoServiceImplTest {
         when(transactionService.getTransaction(anyString(), anyString())).thenThrow(new ServiceException("error"));
 
         assertThrows(DocumentInfoException.class, () ->
-                accountsDocumentInfoService.getDocumentInfo(createDocumentInfoRequest(RESOURCE_URI_ABRIDGED)));
+                accountsDocumentInfoService.getDocumentInfo(createDocumentInfoRequest(RESOURCE_ID_ABRIDGED)));
     }
 
     @Test
@@ -74,33 +74,33 @@ public class AccountsDocumentInfoServiceImplTest {
     @Test
     @DisplayName("Tests the unsuccessful retrieval of document data due to no accounts resource in transaction")
     void testUnsuccessfulGetDocumentInfoNoAccountsResourceInTransaction() throws ServiceException, DocumentInfoException {
-        Transaction transaction = createTransaction(RESOURCE_URI_ABRIDGED);
-        transaction.getResources().remove(RESOURCE_ID);
-        transaction.getResources().put("error", createResource(RESOURCE_URI_ABRIDGED));
+        Transaction transaction = createTransaction(RESOURCE_ID_ABRIDGED);
+        transaction.getResources().remove(RESOURCE_URI);
+        transaction.getResources().put("error", createResource(RESOURCE_ID_ABRIDGED));
         when(transactionService.getTransaction(anyString(), anyString())).thenReturn(transaction);
 
-        assertNull(accountsDocumentInfoService.getDocumentInfo(createDocumentInfoRequest(RESOURCE_URI_ABRIDGED)));
+        assertNull(accountsDocumentInfoService.getDocumentInfo(createDocumentInfoRequest(RESOURCE_ID_ABRIDGED)));
     }
 
     @Test
     @DisplayName("Test DocumentInfoException thrown when error returned from  abridged accounts handler")
     void testErrorThrownWhenFailedAbridgedAccountsHandler() throws HandlerException, ServiceException {
 
-        when(transactionService.getTransaction(anyString(), anyString())).thenReturn(createTransaction(RESOURCE_URI_ABRIDGED));
+        when(transactionService.getTransaction(anyString(), anyString())).thenReturn(createTransaction(RESOURCE_ID_ABRIDGED));
         when(abridgedAccountsDataHandler.getAbridgedAccountsData(any(Transaction.class),  anyString(), anyString())).
                 thenThrow(new HandlerException("error"));
 
         assertThrows(DocumentInfoException.class, () ->
-                accountsDocumentInfoService.getDocumentInfo(createDocumentInfoRequest(RESOURCE_URI_ABRIDGED)));
+                accountsDocumentInfoService.getDocumentInfo(createDocumentInfoRequest(RESOURCE_ID_ABRIDGED)));
     }
 
     @Test
     @DisplayName("Tests the successful retrieval of document data for abridged")
     void testSuccessfulGetDocumentInfoForAbridged() throws HandlerException, ServiceException, DocumentInfoException {
-        when(transactionService.getTransaction(anyString(), anyString())).thenReturn(createTransaction(RESOURCE_URI_ABRIDGED));
+        when(transactionService.getTransaction(anyString(), anyString())).thenReturn(createTransaction(RESOURCE_ID_ABRIDGED));
         when(abridgedAccountsDataHandler.getAbridgedAccountsData(any(Transaction.class), anyString(), anyString())).thenReturn(new DocumentInfoResponse());
 
-        assertNotNull(accountsDocumentInfoService.getDocumentInfo(createDocumentInfoRequest(RESOURCE_URI_ABRIDGED)));
+        assertNotNull(accountsDocumentInfoService.getDocumentInfo(createDocumentInfoRequest(RESOURCE_ID_ABRIDGED)));
     }
 
     @Test
@@ -116,21 +116,21 @@ public class AccountsDocumentInfoServiceImplTest {
     @DisplayName("Test DocumentInfoException thrown when error returned from small full accounts handler")
     void testErrorThrownWhenFailedSmallFullAccountsHandler() throws HandlerException, ServiceException {
 
-        when(transactionService.getTransaction(anyString(), anyString())).thenReturn(createTransaction(RESOURCE_URI_SMALL_FULL));
+        when(transactionService.getTransaction(anyString(), anyString())).thenReturn(createTransaction(RESOURCE_ID_SMALL_FULL));
         when(smallFullAccountsDataHandler.getSmallFullAccountsData(any(Transaction.class),  anyString(), anyString())).
                 thenThrow(new HandlerException("error"));
 
         assertThrows(DocumentInfoException.class, () ->
-                accountsDocumentInfoService.getDocumentInfo(createDocumentInfoRequest(RESOURCE_URI_SMALL_FULL)));
+                accountsDocumentInfoService.getDocumentInfo(createDocumentInfoRequest(RESOURCE_ID_SMALL_FULL)));
     }
 
     @Test
     @DisplayName("Tests the successful retrieval of document data for small full")
     void testSuccessfulGetDocumentInfoForSmallFull() throws HandlerException, ServiceException, DocumentInfoException {
-        when(transactionService.getTransaction(anyString(), anyString())).thenReturn(createTransaction(RESOURCE_URI_SMALL_FULL));
+        when(transactionService.getTransaction(anyString(), anyString())).thenReturn(createTransaction(RESOURCE_ID_SMALL_FULL));
         when(smallFullAccountsDataHandler.getSmallFullAccountsData(any(Transaction.class), anyString(), anyString())).thenReturn(new DocumentInfoResponse());
 
-        assertNotNull(accountsDocumentInfoService.getDocumentInfo(createDocumentInfoRequest(RESOURCE_URI_SMALL_FULL)));
+        assertNotNull(accountsDocumentInfoService.getDocumentInfo(createDocumentInfoRequest(RESOURCE_ID_SMALL_FULL)));
     }
 
     @Test
@@ -143,10 +143,10 @@ public class AccountsDocumentInfoServiceImplTest {
     }
 
 
-    private DocumentInfoRequest createDocumentInfoRequest(String resourceUri) {
+    private DocumentInfoRequest createDocumentInfoRequest(String resourceId) {
         DocumentInfoRequest documentInfoRequest = new DocumentInfoRequest();
-        documentInfoRequest.setResourceId(RESOURCE_ID);
-        documentInfoRequest.setResourceUri(resourceUri);
+        documentInfoRequest.setResourceId(resourceId);
+        documentInfoRequest.setResourceUri(RESOURCE_URI);
         documentInfoRequest.setRequestId(REQUEST_ID);
         return documentInfoRequest;
     }
