@@ -31,9 +31,9 @@ public class DocumentTypeServiceImpl implements DocumentTypeService {
     public DocumentType getDocumentType(Map<String, String> requestParameters) throws ServiceException {
 
         LOG.infoContext(requestParameters.get(REQUEST_ID),"Getting the document type from resource: "
-                + requestParameters.get(RESOURCE_URI), setDebugMap(requestParameters));
+                + requestParameters.get(RESOURCE_ID), setDebugMap(requestParameters));
         return Arrays.stream(DocumentType.values())
-                .filter(docTypeEntry -> requestParameters.get(RESOURCE_URI).matches(docTypeEntry.getPattern()))
+                .filter(docTypeEntry -> requestParameters.get(RESOURCE_ID).matches(docTypeEntry.getPattern()))
                 .findFirst().orElseThrow(() -> new ServiceException(
                         "Could not locate the document type from the Uri"));
     }
