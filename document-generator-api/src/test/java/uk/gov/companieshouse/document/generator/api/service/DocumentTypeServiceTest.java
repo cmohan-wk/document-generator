@@ -22,15 +22,15 @@ public class DocumentTypeServiceTest {
 
     private DocumentTypeService documentTypeService;
 
-    private static final String ACCOUNTS_RESOURCE_URI = "/transactions/091174-913515-326060/accounts/xU-6Vebn7F8AgLwa2QHBUL2yRpk=";
+    private static final String ACCOUNTS_RESOURCE_ID = "/transactions/091174-913515-326060/accounts/xU-6Vebn7F8AgLwa2QHBUL2yRpk=";
 
-    private static final String COMPANY_ACCOUNTS_RESOURCE_URI = "/transactions/091174-913515-326060/company-accounts/xU-6Vebn7F8AgLwa2QHBUL2yRpk=";
+    private static final String COMPANY_ACCOUNTS_RESOURCE_ID = "/transactions/091174-913515-326060/company-accounts/xU-6Vebn7F8AgLwa2QHBUL2yRpk=";
 
-    private static final String RESOURCE_ID = "/transactions/091174-913515-326060";
+    private static final String RESOURCE_ID_VALUE = "/transactions/091174-913515-326060";
 
     private static final String REQUEST_ID = "requestId";
 
-    private static final String RESOURCE_URI = "resource_uri";
+    private static final String RESOURCE_ID = "resource_id";
 
     Map<String, String> requestParameters;
 
@@ -40,14 +40,14 @@ public class DocumentTypeServiceTest {
 
         requestParameters = new HashMap<>();
         requestParameters.put("request_id", REQUEST_ID);
-        requestParameters.put("resource_id", RESOURCE_ID);
+        requestParameters.put("resource_id", RESOURCE_ID_VALUE);
     }
 
     @Test
     @DisplayName("tests that a DocumentType containing 'ACCOUNTS' is returned when uri contains 'accounts'")
     public void testSuccessfulPatternMatchToAccountsReturnedForAccounts() throws ServiceException {
 
-        requestParameters.put(RESOURCE_URI, ACCOUNTS_RESOURCE_URI);
+        requestParameters.put(RESOURCE_ID, ACCOUNTS_RESOURCE_ID);
         DocumentType result = documentTypeService.getDocumentType(requestParameters);
 
         assertEquals(DocumentType.ACCOUNTS, result);
@@ -57,7 +57,7 @@ public class DocumentTypeServiceTest {
     @DisplayName("tests that a DocumentType containing 'ACCOUNTS' is returned when uri contains 'company-accounts'")
     public void testSuccessfulPatternMatchToAccountsReturnedForCompanyAccounts() throws ServiceException {
 
-        requestParameters.put(RESOURCE_URI, COMPANY_ACCOUNTS_RESOURCE_URI);
+        requestParameters.put(RESOURCE_ID, COMPANY_ACCOUNTS_RESOURCE_ID);
         DocumentType result = documentTypeService.getDocumentType(requestParameters);
 
         assertEquals(DocumentType.ACCOUNTS, result);
@@ -67,7 +67,7 @@ public class DocumentTypeServiceTest {
     @DisplayName("tests that an error returned when incorrect Uri input")
     public void testErrorReturnedWhenUriDoesNotMatchPattern() {
 
-        requestParameters.put(RESOURCE_URI, "wrong data");
+        requestParameters.put(RESOURCE_ID, "wrong data");
         assertThrows(ServiceException.class, () -> documentTypeService.getDocumentType(requestParameters));
     }
 }
