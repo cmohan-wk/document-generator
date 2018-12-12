@@ -248,7 +248,7 @@ public class DocumentGeneratorServiceImpl implements DocumentGeneratorService {
 
         if (renderResponse != null) {
             Links links = new Links();
-            links.setLocation(renderResponse.getLocation());
+            links.setLocation(buildLocation(documentInfoResponse.getPath()));
             response.setLinks(links);
             response.setSize(renderResponse.getDocumentSize());
         }
