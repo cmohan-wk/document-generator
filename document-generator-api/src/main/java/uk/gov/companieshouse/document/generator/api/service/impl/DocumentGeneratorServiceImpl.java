@@ -1,5 +1,11 @@
 package uk.gov.companieshouse.document.generator.api.service.impl;
 
+import static uk.gov.companieshouse.document.generator.api.DocumentGeneratorApplication.APPLICATION_NAME_SPACE;
+
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpStatus;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,12 +31,6 @@ import uk.gov.companieshouse.document.generator.interfaces.model.DocumentInfoRes
 import uk.gov.companieshouse.environment.EnvironmentReader;
 import uk.gov.companieshouse.logging.Logger;
 import uk.gov.companieshouse.logging.LoggerFactory;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import static uk.gov.companieshouse.document.generator.api.DocumentGeneratorApplication.APPLICATION_NAME_SPACE;
 
 @Service
 public class DocumentGeneratorServiceImpl implements DocumentGeneratorService {
@@ -93,6 +93,7 @@ public class DocumentGeneratorServiceImpl implements DocumentGeneratorService {
 
         createAndLogInfoMessage("Generation of document for resource: "
                         + requestParameters.get(RESOURCE_URI) + " has started", requestParameters);
+
         DocumentType documentType;
         try {
             documentType = documentTypeService.getDocumentType(requestParameters);
@@ -109,6 +110,7 @@ public class DocumentGeneratorServiceImpl implements DocumentGeneratorService {
             documentInfoResponse = documentInfoServiceFactory
                         .get(documentType.toString())
                         .getDocumentInfo(documentInfoRequest);
+
         } catch (DocumentInfoException die) {
              createAndLogErrorMessage("Error occurred whilst obtaining the data to generate document " +
                      "for resource: " + requestParameters.get(RESOURCE_URI), die, requestParameters);
@@ -122,16 +124,20 @@ public class DocumentGeneratorServiceImpl implements DocumentGeneratorService {
                 renderResponse = renderSubmittedDocumentData(documentRequest, documentInfoResponse,
                         requestParameters);
                 if (renderResponse.getStatus() >= HttpStatus.SC_BAD_REQUEST) {
+
                     createAndLogErrorMessage("An error occurred in the render service, returning a status of: " +
                                     renderResponse.getStatus() + " for resource: " + requestParameters.get(RESOURCE_URI),
                             null, requestParameters);
+
                     response = setDocumentResponse(renderResponse, documentInfoResponse, requestParameters);
+
                     return new ResponseObject(ResponseStatus.FAILED_TO_RENDER, response);
                 }
             } catch (IOException | RenderServiceException se) {
                 createAndLogErrorMessage("Error occurred when trying to render the document for resource: " +
                         requestParameters.get(RESOURCE_URI), se, requestParameters);
                 response = setDocumentResponse(renderResponse, documentInfoResponse, requestParameters);
+
                 return new ResponseObject(ResponseStatus.FAILED_TO_RENDER, response);
             }
 
@@ -139,10 +145,13 @@ public class DocumentGeneratorServiceImpl implements DocumentGeneratorService {
         } else {
             createAndLogErrorMessage("No data was returned from documentInfoService for resource: " +
                     requestParameters.get(RESOURCE_URI),null, requestParameters);
+
             return new ResponseObject(ResponseStatus.NO_DATA_RETRIEVED, null);
         }
+
         createAndLogInfoMessage("Document generated for resource: " + requestParameters.get(RESOURCE_URI),
                 requestParameters);
+
         return new ResponseObject(ResponseStatus.CREATED, response);
     }
 
@@ -247,9 +256,7 @@ public class DocumentGeneratorServiceImpl implements DocumentGeneratorService {
         DocumentResponse response = new DocumentResponse();
 
         if (renderResponse != null) {
-            Links links = new Links();
-            links.setLocation(renderResponse.getLocation());
-            response.setLinks(links);
+            response.setLinks(createLinksWithFormattedLocation(renderResponse, documentInfoResponse));
             response.setSize(renderResponse.getDocumentSize());
         }
 
@@ -258,6 +265,21 @@ public class DocumentGeneratorServiceImpl implements DocumentGeneratorService {
         response.setDescriptionIdentifier(documentInfoResponse.getDescriptionIdentifier());
 
         return response;
+    }
+
+    private Links createLinksWithFormattedLocation(RenderDocumentResponse renderResponse,
+        DocumentInfoResponse documentInfoResponse) {
+        Links links = new Links();
+
+        if (StringUtils.contains(renderResponse.getLocation(), documentInfoResponse.getPath())) {
+            links.setLocation(buildLocation(documentInfoResponse.getPath()));
+        } else {
+            createAndLogErrorMessage(
+                "The renderResponse's does not contain the expected link, documentInfoResponse's link",
+                null, null);
+        }
+
+        return links;
     }
 
     /**
@@ -302,7 +324,7 @@ public class DocumentGeneratorServiceImpl implements DocumentGeneratorService {
             serviceException =
                     new ServiceException(message);
         }
-        
+
         LOG.errorContext(requestParameters.get(REQUEST_ID), serviceException,
                 setDebugMap(requestParameters));
     }
