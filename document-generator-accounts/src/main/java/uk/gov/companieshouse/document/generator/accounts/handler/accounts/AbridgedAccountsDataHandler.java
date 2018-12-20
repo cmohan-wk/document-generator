@@ -67,7 +67,9 @@ public class AbridgedAccountsDataHandler {
         String abridgedAccountLink = getAccountLink(accounts);
 
         try {
+            LOG.info("SHAUN TEST: start of get abridged accounts data");
             AbridgedAccountsApi abridgedAccountData = accountsService.getAbridgedAccounts(abridgedAccountLink, requestId);
+            LOG.info("SHAUN TEST: end of get abridged accounts data");
             return createResponse(transaction, accountType, abridgedAccountData);
         } catch (ServiceException | IOException e) {
             Map<String, Object> logMap = new HashMap<>();
@@ -135,6 +137,7 @@ public class AbridgedAccountsDataHandler {
                                                 AbridgedAccountsApi accountData)
             throws ServiceException, IOException {
 
+        LOG.info("SHAUN TEST: start of create response");
         DocumentInfoResponse documentInfoResponse = new DocumentInfoResponse();
         documentInfoResponse.setData(createDocumentInfoResponseData(transaction, accountData));
         documentInfoResponse.setAssetId(accountType.getAssetId());
@@ -146,6 +149,7 @@ public class AbridgedAccountsDataHandler {
 
         documentInfoResponse.setDescriptionValues(descriptionValues);
         documentInfoResponse.setDescriptionIdentifier(accountType.getEnumerationKey());
+        LOG.info("SHAUN TEST: end of create response");
         return documentInfoResponse;
     }
 

@@ -106,9 +106,11 @@ public class DocumentGeneratorServiceImpl implements DocumentGeneratorService {
 
         DocumentInfoResponse documentInfoResponse;
         try {
+            LOG.info("SHAUN TEST: start of the doc-info-request");
             documentInfoResponse = documentInfoServiceFactory
                         .get(documentType.toString())
                         .getDocumentInfo(documentInfoRequest);
+            LOG.info("SHAUN TEST: end of the doc-info-request");
         } catch (DocumentInfoException die) {
              createAndLogErrorMessage("Error occurred whilst obtaining the data to generate document " +
                      "for resource: " + requestParameters.get(RESOURCE_URI), die, requestParameters);
