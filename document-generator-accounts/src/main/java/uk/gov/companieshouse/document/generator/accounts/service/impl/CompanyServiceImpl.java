@@ -10,6 +10,10 @@ import uk.gov.companieshouse.api.model.company.CompanyProfileApi;
 import uk.gov.companieshouse.document.generator.accounts.exception.ServiceException;
 import uk.gov.companieshouse.document.generator.accounts.service.ApiClientService;
 import uk.gov.companieshouse.document.generator.accounts.service.CompanyService;
+import uk.gov.companieshouse.logging.Logger;
+import uk.gov.companieshouse.logging.LoggerFactory;
+
+import static uk.gov.companieshouse.document.generator.accounts.AccountsDocumentInfoServiceImpl.MODULE_NAME_SPACE;
 
 
 @Service
@@ -21,6 +25,8 @@ public class CompanyServiceImpl implements CompanyService {
     private static final UriTemplate GET_COMPANY_URI =
             new UriTemplate("/company/{companyNumber}");
 
+    private static final Logger LOG = LoggerFactory.getLogger(MODULE_NAME_SPACE);
+
     @Override
     public CompanyProfileApi getCompanyProfile(String companyNumber) throws ServiceException {
 
@@ -31,7 +37,9 @@ public class CompanyServiceImpl implements CompanyService {
         String uri = GET_COMPANY_URI.expand(companyNumber).toString();
 
         try {
+            LOG.info("SHAUN TEST: start execute company profile api");
             companyProfileApi = apiClient.company().get(uri).execute();
+            LOG.info("SHAUN TEST: end execute company profile api");
         } catch (ApiErrorResponseException e) {
 
             throw new ServiceException("Error retrieving company profile", e);
