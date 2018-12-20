@@ -163,7 +163,9 @@ public class AbridgedAccountsDataHandler {
         AbridgedAccountsApiData abridgedAccountsApiData = new AbridgedAccountsApiData();
         abridgedAccountsApiData.setAbridgedAccountsApi(accountData);
 
+        LOG.info("SHAUN TEST: start of get company profile");
         CompanyProfileApi companyProfile = companyService.getCompanyProfile(transaction.getCompanyNumber());
+        LOG.info("SHAUN TEST: end of get company profile");
         abridgedAccountsApiData.setCompanyName(companyProfile.getCompanyName());
         abridgedAccountsApiData.setCompanyNumber(companyProfile.getCompanyNumber());
 
@@ -172,9 +174,11 @@ public class AbridgedAccountsDataHandler {
 
     private String writeAccountsValues(AbridgedAccountsApiData abridgedAccountsApiData) throws IOException {
 
+        LOG.info("SHAUN TEST: start of write accounts values");
         ObjectMapper mapper = new ObjectMapper();
         String accountsJSON = mapper.writeValueAsString(abridgedAccountsApiData);
         JsonNode accounts = mapper.readTree(accountsJSON);
+        LOG.info("SHAUN TEST: end of write accounts values");
 
         return accounts.toString();
     }
